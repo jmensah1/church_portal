@@ -19,7 +19,6 @@ const createService = async (req, res) => {
     attendance,
     speaker,
     theme,
-    owner,
     churchday,
     otherFields,
   } = req.body;
@@ -31,8 +30,8 @@ const createService = async (req, res) => {
     attendance,
     speaker,
     theme,
-    owner,
     churchday,
+    owner: req.user.userId, // Automatically set owner from authenticated user
     ...otherFields,
   };
 

@@ -4,7 +4,13 @@ const { checkPermissions } = require("../utils");
 const Member = require("../models/Member");
 
 const createMember = async (req, res) => {
-  const member = await Member.create(req.body);
+  // Add the owner field from the authenticated user
+  const memberData = {
+    ...req.body,
+    owner: req.user.userId,
+  };
+
+  const member = await Member.create(memberData);
   if (!member) {
     throw new CustomError.NotFoundError("Member creation failed");
   }

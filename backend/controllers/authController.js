@@ -38,12 +38,21 @@ const register = async (req, res) => {
 
   const origin = "http://localhost:3000";
 
-  sendVerificationEmail({ name, email, verificationToken, origin });
-
-  res.status(StatusCodes.CREATED).json({
-    msg: "user created successfully, check email to verify account",
-    verificationToken: verificationToken,
-  });
+  // Only send verification email if email is configured
+  if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    sendVerificationEmail({ name, email, verificationToken, origin });
+    res.status(StatusCodes.CREATED).json({
+      msg: "user created successfully, check email to verify account",
+      verificationToken: verificationToken,
+    });
+  } else {
+    // For development without email configuration
+    res.status(StatusCodes.CREATED).json({
+      msg: "user created successfully (development mode - no email verification required)",
+      verificationToken: verificationToken,
+      user: createTokenUser(user)
+    });
+  }
 
 };
 
@@ -65,7 +74,8 @@ const login = async (req, res) => {
 
   const isUserVerified = user.isVerified;
 
-  if (!isUserVerified) {
+  // In development mode without email, allow unverified users
+  if (!isUserVerified && (process.env.EMAIL_USER && process.env.EMAIL_PASS)) {
     throw new CustomError.UnauthenticatedError("User email is not verified");
   }
 

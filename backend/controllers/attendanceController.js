@@ -15,7 +15,13 @@ const getAllAttendance = async (req, res) => {
 
 //TODO prevent duplicate for checking in
 const createAttendance = async (req, res) => {
-  const attendanceRecord = await Attendance.create(req.body);
+  // Add the owner field from the authenticated user
+  const attendanceData = {
+    ...req.body,
+    owner: req.user.userId,
+  };
+
+  const attendanceRecord = await Attendance.create(attendanceData);
   res
     .status(StatusCodes.OK)
     .send({ msg: "Record created successfully", attendanceRecord });

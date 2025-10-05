@@ -14,7 +14,13 @@ const getAllChurchdays = async (req, res) => {
 };
 
 const createChurchday = async (req, res) => {
-  const churchday = await Churchday.create(req.body);
+  // Add the owner field from the authenticated user
+  const churchdayData = {
+    ...req.body,
+    owner: req.user.userId,
+  };
+
+  const churchday = await Churchday.create(churchdayData);
   res.status(StatusCodes.CREATED).json({ churchday });
 };
 
